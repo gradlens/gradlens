@@ -111,3 +111,28 @@ def test_monitor_close_method(simple_model):
         
         monitor.close()
         mock_cleanup.assert_called_once()
+
+def test_monitor_log_with_custom_metrics(simple_model):
+    """
+    Tests that monitor.log() can accept and record
+    additional, user-defined metrics like 'accuracy'.
+    """
+    monitor = watch(simple_model)
+    
+    # --- Act ---
+    test_loss = 0.5
+    custom_metrics = {"accuracy": 0.95, "f1_score": 0.8}
+    
+    monitor.log(loss=test_loss, metrics=custom_metrics)
+    
+    # --- Assert ---
+    stats = monitor.get_stats()
+    history = monitor.get_history()
+
+    # Check that metrics were recorded correctly in the last step
+    assert stats["loss"] == test_loss
+    assert stats["custom_metrics"] == custom_metrics
+    
+    # Check that history was appended
+    assert len(history["custom_metrics"]) == 1
+    assert history["custom_metrics"][0] == custom_metrics

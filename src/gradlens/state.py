@@ -1,5 +1,6 @@
 # src/gradlens/state.py
 
+import torch
 from typing import Dict, List, Any, Optional
 
 class State:
@@ -15,13 +16,14 @@ class State:
         self.current_dead_neurons: Dict[str, float] = {}
         # Buffer for alerts *within* the current step
         self.current_nan_alert: Optional[str] = None 
-
+        self.current_custom_metrics: Dict[str, float] = {}
         # --- 2. Full History (Long-Term Storage) ---
         self.loss_history: List[float] = []
         self.grad_norm_history: List[Dict[str, float]] = []
         self.dead_neuron_history: List[Dict[str, float]] = []
         # History of alerts from *all* past steps
         self.nan_alert_history: List[Optional[str]] = []
+        self.metrics_history: List[Dict[str, float]] = []
 
     # --- Methods for HookManager (Writers) ---
 
@@ -46,6 +48,10 @@ class State:
         if not torch.isfinite(torch.tensor(loss)):
              self.record_nan_alert(f"Loss")
 
+    def log_custom_metrics(self, metrics: Dict[str, float]) -> None:
+            """Called by Monitor.log() to record custom metrics."""
+            self.current_custom_metrics = metrics.copy()
+
     def process_hook_data(self) -> None:
         """
         "Commits" all data from the temporary step buffers
@@ -56,19 +62,22 @@ class State:
         self.grad_norm_history.append(self.current_grad_norms.copy())
         self.dead_neuron_history.append(self.current_dead_neurons.copy())
         self.nan_alert_history.append(self.current_nan_alert)
+        self.metrics_history.append(self.current_custom_metrics.copy())
 
         # 2. Clear step buffers for the next iteration
         self.current_loss = 0.0
         self.current_grad_norms.clear()
         self.current_dead_neurons.clear()
         self.current_nan_alert = None # Reset alert
+        self.current_custom_metrics.clear()
 
     def get_current_stats(self) -> Dict[str, Any]:
         return {
             "loss": self.loss_history[-1] if self.loss_history else None,
             "grad_norm": self.grad_norm_history[-1] if self.grad_norm_history else {},
             "dead_neuron_pct": self.dead_neuron_history[-1] if self.dead_neuron_history else {},
-            "nan_alert": self.nan_alert_history[-1] if self.nan_alert_history else None
+            "nan_alert": self.nan_alert_history[-1] if self.nan_alert_history else None,
+            "custom_metrics": self.metrics_history[-1] if self.metrics_history else {},
         }
 
     def get_full_history(self) -> Dict[str, Any]:
@@ -76,5 +85,6 @@ class State:
             "loss": self.loss_history,
             "grad_norm": self.grad_norm_history,
             "dead_neuron_pct": self.dead_neuron_history,
-            "nan_alerts": self.nan_alert_history
+            "nan_alerts": self.nan_alert_history,
+            "custom_metrics": self.metrics_history,
         }
