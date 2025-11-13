@@ -6,6 +6,8 @@ from typing import Dict, Any
 from .state import State
 from .hooks import HookManager
 
+from typing import Dict, Any, Optional
+
 
 class Monitor:
     """
@@ -37,7 +39,7 @@ class Monitor:
             print(f"Error: Failed to initialize GradLens Monitor. {e}")
             # We might want a more robust logging/warning here
             
-    def log(self, loss: float) -> None:
+    def log(self, loss: float, metrics: Optional[Dict[str, float]] = None) -> None:        
         """
         Logs a single training step's loss.
 
@@ -53,6 +55,9 @@ class Monitor:
 
         # 1. Log the manually provided loss
         self.state.log_loss(loss)
+
+        if metrics:
+            self.state.log_custom_metrics(metrics)
 
         # 2. Process all data collected by hooks in this step
         # (e.g., aggregate gradient norms, clear buffers)
