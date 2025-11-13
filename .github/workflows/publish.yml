@@ -1,0 +1,41 @@
+# .github/workflows/publish.yml
+# This file ONLY publishes to PyPI on new tags.
+
+name: Publish Python Package to PyPI
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger the workflow on version tags like v0.1.0
+
+jobs:
+  publish-to-pypi:
+    name: Build and publish Python distributions to PyPI
+    runs-on: ubuntu-latest
+    
+    # This permission is ESSENTIAL for Trusted Publishing (OIDC)
+    permissions:
+      id-token: write  # This allows GitHub to securely talk to PyPI
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Hatch (for building)
+        run: pip install hatch
+
+      - name: Build package
+        # Use hatch to build the .whl and .tar.gz
+        run: hatch build
+
+      - name: Publish package to PyPI
+        # Use the official PyPA action, which supports Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          attestations: false  # Explicitly disable OIDC attestations while token auth is in use

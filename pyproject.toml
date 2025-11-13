@@ -1,0 +1,54 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gradlens"
+dynamic = ["version"]
+description = "An enterprise-grade PyTorch monitoring and analytics toolkit."
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+authors = [
+    { name = "Mahdi Mosavi", email = "mahdi.mosavi.nsa@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: System :: Monitoring",
+]
+
+dependencies = [
+    "torch",
+    "numpy",
+]
+
+[project.urls]
+Homepage = "https://github.com/gradlens/gradlens"
+Repository = "https://github.com/gradlens/gradlens"
+
+[tool.hatch.version]
+path = "src/gradlens/__about__.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["/src"]
+
+
+[tool.hatch.envs.default]
+dependencies = [
+    "pytest",
+    "pytest-cov",
+]
+[tool.hatch.envs.default.scripts]
+test = "pytest"
+
+[tool.hatch.publish.pypi]
+user = "__token__"

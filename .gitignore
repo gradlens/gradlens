@@ -1,0 +1,30 @@
+# Python cache files
+__pycache__/
+*.pyc
+
+# Hatch environment
+# This is critical for Hatch!
+.hatch/
+
+# Virtual environment folders
+venv/
+.venv/
+env/
+.env
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# IDE and editor folders
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+.pytest_cache/
+.coverage
