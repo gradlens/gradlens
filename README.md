@@ -71,33 +71,3 @@ finally:
     print(f"Dead Neuron %: {last_stats['dead_neuron_pct']}")
 ```
 
----
-
-This is the **v0.1 engine**. Visualization and advanced analytics will be added in future versions.
-
----
-
-## 🧑‍💻 Development & Packaging
-
-1. **Set up a virtual environment**
-   ```bash
-   python -m venv .venv && source .venv/bin/activate
-   pip install --upgrade pip hatch
-   ```
-2. **Run the automated test suite**
-   ```bash
-   hatch run test
-   ```
-3. **Build distributable artifacts (wheel + sdist)**
-   ```bash
-   HATCH_HOME=.hatch hatch build
-   ```
-   > Setting `HATCH_HOME` keeps Hatch’s build env inside the repo, which works well on locked-down machines/CI runners.
-4. **Publish to PyPI (manual invocation)**
-   ```bash
-   HATCH_INDEX_USER="__token__" \
-   HATCH_INDEX_AUTH="$PYPI_API_TOKEN" \
-   hatch publish pypi
-   ```
-
-Tagging releases as `v*` lets GitHub Actions (when re-enabled) run the same build/publish pipeline automatically.
